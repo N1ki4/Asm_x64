@@ -1,23 +1,5 @@
-#include <windows.h>
-#include <stdio.h>
+#include "Main.h"
 
-//------------------------------------------------------------------------------------------------------------
-struct SPos
-{
-   SPos(unsigned short x_pos, unsigned short y_pos, unsigned short screen_width, unsigned short len)
-      : X_Pos(x_pos), Y_Pos(y_pos), Screen_Width(screen_width), Len(len)
-   {
-   }
-
-   unsigned short X_Pos;
-   unsigned short Y_Pos;
-   unsigned short Screen_Width;
-   unsigned short Len;
-};
-//------------------------------------------------------------------------------------------------------------
-extern "C" int Make_Sum(int one_value, int another_value);
-extern "C" void Draw_Line_Horizontal(CHAR_INFO *screen_buffer, SPos pos, CHAR_INFO symbol);
-extern "C" void Show_Colors(CHAR_INFO *screen_buffer, SPos pos, CHAR_INFO symbol);
 //------------------------------------------------------------------------------------------------------------
 int main(void)
 {
@@ -66,15 +48,12 @@ int main(void)
     //screen_buffer[0].Char.UnicodeChar = L'W';
     //screen_buffer[0].Attributes = 0x50;
 
-    CHAR_INFO symbol{};
-    symbol.Char.UnicodeChar = L'-';
-    symbol.Attributes = 0x1b;
+    int half_width = screen_buffer_info.dwSize.X / 2;
+    APanel left_panel(0, 0, half_width, screen_buffer_info.dwSize.Y - 2, screen_buffer, screen_buffer_info.dwSize.X);
+    // APanel right_panel(half_width, 0, half_width, screen_buffer_info.dwSize.Y - 2, screen_buffer);
 
-    SPos pos(2, 1, screen_buffer_info.dwSize.X, 10);
-
-    Draw_Line_Horizontal(screen_buffer, pos, symbol);
-
-    Show_Colors(screen_buffer, pos, symbol);
+    left_panel.Draw();
+    // right_panel.Draw();
 
     if (! WriteConsoleOutput(screen_buffer_handle, screen_buffer, screen_buffer_info.dwSize, screen_buffer_pos, &screen_buffer_info.srWindow) )
     {

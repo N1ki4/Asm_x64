@@ -73,6 +73,52 @@ Draw_Line_Horizontal proc
 
 Draw_Line_Horizontal endp
 ;-------------------------------------------------------------------------------------------------------------
+Draw_Line_Vertical proc
+; extern "C" void Draw_Line_Vertical(CHAR_INFO * screen_buffer, SPos pos, CHAR_INFO symbol);
+; RCX - screen_buffer
+; RDX - pos
+; R8 - symbol
+
+	push rax
+	push rcx
+	push rdi
+	push r10
+	push r11
+
+	; 1. Calculate the output address
+	call Get_Pos_Address  ; RDI = character position in buffer screen_buffer in positions pos
+
+	mov r10, rdi
+
+	; 2. Output Position Correction Calculation
+	mov r11, rdx
+	shr r11, 32  ; R11 = pos
+	movzx r11, r11w  ; R11 = R11W = pos.Screen_Width
+	dec r11
+	shl r11, 2  ; R11 = pos.Screen_Width * 4 = Screen width in bytes
+
+	; 3. Preparing cycles
+	mov rcx, rdx  
+	shr rcx, 48   ; RCX = CX = pos.Len
+
+	mov eax, r8d  ; EAX = symbol
+
+_1:
+	stosd         ; Output symbols
+	add rdi, r11
+
+	loop _1
+
+	pop r11
+	pop r10
+	pop rdi
+	pop rcx
+	pop rax
+
+	ret
+
+Draw_Line_Vertical endp
+;-------------------------------------------------------------------------------------------------------------
 Show_Colors proc
 ; extern "C" void Show_Colors(CHAR_INFO *screen_buffer, SPos pos, CHAR_INFO symbol);
 ; RCX - screen_buffer
